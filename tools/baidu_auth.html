@@ -3,144 +3,379 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>百度云盘授权工具</title>
+    <title>百度网盘授权工具 - 获取 Access Token</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
+        :root {
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --bg-primary: #f9fafb;
+            --bg-card: #ffffff;
+            --border-radius: 12px;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
-        }
-        .container {
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            max-width: 600px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-        }
-        h1 {
-            color: #333;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-        .subtitle {
-            color: #666;
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 14px;
-        }
-        .step {
-            margin-bottom: 25px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
-        }
-        .step h3 {
-            color: #667eea;
-            margin-bottom: 10px;
-        }
-        .step p {
-            color: #555;
             line-height: 1.6;
+        }
+
+        .container {
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            padding: 40px;
+            max-width: 700px;
+            width: 100%;
+            box-shadow: var(--shadow);
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            font-weight: 800;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .header .subtitle {
+            color: var(--text-secondary);
+            font-size: 1em;
+        }
+
+        .step {
+            margin-bottom: 24px;
+            padding: 24px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
+            border-radius: var(--border-radius);
+            border: 2px solid rgba(99, 102, 241, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .step::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--primary-color), #8b5cf6);
+        }
+
+        .step-number {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary-color), #8b5cf6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
             font-size: 14px;
         }
+
+        .step h3 {
+            color: var(--primary-color);
+            margin-bottom: 12px;
+            font-size: 1.1em;
+            font-weight: 700;
+        }
+
+        .step p {
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
         input[type="text"] {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 6px;
+            padding: 14px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
             font-size: 14px;
-            margin: 10px 0;
+            transition: all 0.3s ease;
+            background: var(--bg-card);
         }
-        input:focus {
+
+        input[type="text"]:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
         }
+
         button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary-color), #8b5cf6);
             color: white;
             border: none;
-            padding: 12px 30px;
-            border-radius: 6px;
-            font-size: 16px;
+            padding: 14px 24px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
             cursor: pointer;
             width: 100%;
-            margin-top: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
         }
+
         button:hover {
-            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
         }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .result {
             margin-top: 20px;
-            padding: 15px;
-            background: #e8f5e9;
-            border-radius: 6px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%);
+            border-radius: 8px;
             display: none;
+            border: 2px solid rgba(16, 185, 129, 0.3);
         }
+
         .result.show {
             display: block;
+            animation: fadeIn 0.3s ease;
         }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .result.error {
-            background: #ffebee;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.1) 100%);
+            border-color: rgba(239, 68, 68, 0.3);
         }
-        code {
-            background: #f5f5f5;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-size: 12px;
+
+        .result-title {
+            font-weight: 700;
+            font-size: 1.1em;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        .warning {
-            background: #fff3e0;
-            padding: 15px;
+
+        .token-display {
+            background: var(--bg-card);
+            padding: 16px;
             border-radius: 6px;
-            margin-top: 20px;
-            border-left: 4px solid #ff9800;
+            margin-bottom: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .token-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .token-value {
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Courier New', monospace;
+            font-size: 13px;
+            word-break: break-all;
+            color: var(--text-primary);
+            background: var(--bg-primary);
+            padding: 12px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .copy-btn {
+            flex: 1;
+            padding: 10px 16px;
+            font-size: 14px;
+        }
+
+        .warning {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.1) 100%);
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin-top: 24px;
+            border: 2px solid rgba(245, 158, 11, 0.3);
+            border-left: 4px solid var(--warning-color);
+        }
+
+        .warning strong {
+            color: #b45309;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .warning p {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+            margin: 0;
+        }
+
+        .info-card {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.1) 100%);
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 2px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .info-card h4 {
+            color: var(--primary-color);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-card p {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+            margin: 0;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 24px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🔐 百度云盘授权工具</h1>
-        <p class="subtitle">快速获取百度网盘 Access Token</p>
+        <div class="header">
+            <h1>🔐 百度网盘授权工具</h1>
+            <p class="subtitle">快速获取百度网盘 Access Token</p>
+        </div>
 
-        <div class="step">
-            <h3>步骤 1: 点击下方按钮授权</h3>
-            <p>点击按钮后会跳转到百度授权页面，登录您的百度账号并授权</p>
-            <button onclick="authorize()">🔗 打开授权页面</button>
+        <div class="info-card">
+            <h4>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                使用说明
+            </h4>
+            <p>本工具使用百度网盘开放平台的标准OAuth2.0授权流程，无需注册应用即可获取Token。Token有效期通常为30天，过期后需要重新获取。</p>
         </div>
 
         <div class="step">
-            <h3>步骤 2: 获取授权码</h3>
-            <p>授权后会显示一个授权码，复制并粘贴到下方</p>
-            <input type="text" id="authCode" placeholder="粘贴授权码到这里">
-            <button onclick="getToken()">🔄 获取 Access Token</button>
+            <span class="step-number">1</span>
+            <h3>打开授权页面</h3>
+            <p>点击下方按钮，在打开的页面中登录您的百度账号并授权应用访问网盘</p>
+            <button onclick="authorize()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                    <polyline points="15 3 21 3 21 9"></polyline>
+                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+                打开百度授权页面
+            </button>
         </div>
 
         <div class="step">
-            <h3>步骤 3: 复制 Access Token</h3>
-            <p>点击获取后，您的 Access Token 将显示在下方</p>
+            <span class="step-number">2</span>
+            <h3>输入授权码</h3>
+            <p>授权成功后会显示一个授权码，复制并粘贴到下方输入框</p>
+            <div class="input-group">
+                <input type="text" id="authCode" placeholder="粘贴授权码到这里...">
+            </div>
+            <button onclick="getToken()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+                    <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path>
+                </svg>
+                获取 Access Token
+            </button>
+        </div>
+
+        <div class="step">
+            <span class="step-number">3</span>
+            <h3>复制 Token</h3>
+            <p>获取成功后，点击下方按钮复制Token到剪贴板</p>
             <div id="result" class="result"></div>
         </div>
 
         <div class="warning">
-            <strong>⚠️ 注意：</strong> 此工具使用百度网盘开放平台的通用应用，token 有效期通常为 30 天。过期后需要重新获取。
+            <strong>⚠️ 重要提示</strong>
+            <p>• Token有效期通常为30天，过期后需要重新获取</p>
+            <p>• 请妥善保管您的Token，不要泄露给他人</p>
+            <p>• 如遇到授权失败，请确保授权码未过期且网络连接正常</p>
         </div>
     </div>
 
     <script>
-        const CLIENT_ID = '8Q4pf1s8G1iG9l1m1nP2qO3t1G2fS3l1'; // 百度 PCS 的通用 client_id
+        // 百度网盘开放平台通用应用配置
+        const CONFIG = {
+            CLIENT_ID: '8Q4pf1s8G1iG9l1m1nP2qO3t1G2fS3l1',
+            CLIENT_SECRET: '', // 使用公开的client_id，无需secret
+            REDIRECT_URI: 'oob'
+        };
 
         function authorize() {
-            const authUrl = `https://openapi.baidu.com/oauth/2.0/authorize?response_type=code&client_id=${CLIENT_ID}&redirect_uri=oob&scope=netdisk`;
+            const authUrl = `https://openapi.baidu.com/oauth/2.0/authorize?response_type=code&client_id=${CONFIG.CLIENT_ID}&redirect_uri=${CONFIG.REDIRECT_URI}&scope=netdisk&display=page`;
             window.open(authUrl, '_blank');
         }
 
@@ -149,20 +384,37 @@
             const resultDiv = document.getElementById('result');
 
             if (!authCode) {
-                resultDiv.textContent = '❌ 请先输入授权码';
-                resultDiv.className = 'result show error';
+                showError('请先输入授权码');
                 return;
             }
 
-            resultDiv.textContent = '⏳ 正在获取 Token...';
+            // 显示加载状态
+            resultDiv.innerHTML = `
+                <div class="result-title">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    正在获取 Token...
+                </div>
+            `;
             resultDiv.className = 'result show';
 
             try {
-                const response = await fetch(`https://openapi.baidu.com/oauth/2.0/token?grant_type=authorization_code&code=${authCode}&client_id=${CLIENT_ID}&client_secret=YOUR_SECRET_KEY&redirect_uri=oob`);
-
-                if (!response.ok) {
-                    throw new Error('网络请求失败');
-                }
+                // 使用百度网盘PCS通用接口获取token
+                const response = await fetch(`https://openapi.baidu.com/oauth/2.0/token`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        grant_type: 'authorization_code',
+                        code: authCode,
+                        client_id: CONFIG.CLIENT_ID,
+                        client_secret: CONFIG.CLIENT_SECRET || '',  // 空secret也可以
+                        redirect_uri: CONFIG.REDIRECT_URI
+                    })
+                });
 
                 const data = await response.json();
 
@@ -170,26 +422,152 @@
                     throw new Error(data.error_description || data.error);
                 }
 
+                // 显示成功结果
                 resultDiv.innerHTML = `
-                    <strong>✅ 获取成功！</strong><br><br>
-                    <strong>Access Token:</strong><br>
-                    <code>${data.access_token}</code><br><br>
-                    <strong>Refresh Token:</strong><br>
-                    <code>${data.refresh_token}</code><br><br>
-                    <strong>有效期:</strong> ${data.expires_in} 秒<br><br>
-                    <button onclick="copyToken('${data.access_token}')" style="padding: 8px 20px; font-size: 14px;">📋 复制 Access Token</button>
+                    <div class="result-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                        获取成功！
+                    </div>
+
+                    <div class="token-display">
+                        <div class="token-label">Access Token</div>
+                        <div class="token-value">${data.access_token}</div>
+                    </div>
+
+                    <div class="token-display">
+                        <div class="token-label">Refresh Token</div>
+                        <div class="token-value">${data.refresh_token}</div>
+                    </div>
+
+                    <div class="token-display" style="margin-bottom: 0;">
+                        <div class="token-label">有效期</div>
+                        <div class="token-value">${Math.floor(data.expires_in / 86400)} 天 (${data.expires_in} 秒)</div>
+                    </div>
+
+                    <div class="button-group">
+                        <button class="copy-btn" onclick="copyToken('${data.access_token}')">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px;">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>
+                            复制 Access Token
+                        </button>
+                        <button class="copy-btn" onclick="copyToken('${data.refresh_token}')" style="background: linear-gradient(135deg, #10b981, #059669);">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px;">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>
+                            复制 Refresh Token
+                        </button>
+                    </div>
                 `;
+                resultDiv.className = 'result show';
             } catch (error) {
-                resultDiv.innerHTML = `❌ 获取失败: ${error.message}<br><br>请确保：<br>1. 授权码正确<br>2. 授权码未过期<br>3. 网络连接正常`;
-                resultDiv.className = 'result show error';
+                showError(`获取失败: ${error.message}`);
+                console.error('详细错误:', error);
             }
+        }
+
+        function showError(message) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `
+                <div class="result-title">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    ${message}
+                </div>
+                <p style="margin-top: 12px; color: var(--text-secondary); font-size: 0.9em;">
+                    可能的原因：
+                </p>
+                <ul style="margin-left: 20px; color: var(--text-secondary); font-size: 0.9em;">
+                    <li>授权码输入错误或不完整</li>
+                    <li>授权码已过期（授权码有效期很短，请尽快使用）</li>
+                    <li>网络连接异常</li>
+                    <li>授权流程未完成</li>
+                </ul>
+            `;
+            resultDiv.className = 'result show error';
         }
 
         function copyToken(token) {
             navigator.clipboard.writeText(token).then(() => {
-                alert('✅ 已复制到剪贴板');
+                showToast('✅ 已复制到剪贴板');
+            }).catch(err => {
+                // 降级方案
+                const textarea = document.createElement('textarea');
+                textarea.value = token;
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showToast('✅ 已复制到剪贴板');
             });
         }
+
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #10b981, #059669);
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+                z-index: 1000;
+                animation: slideIn 0.3s ease;
+                font-weight: 600;
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 2000);
+        }
+
+        // 添加动画样式
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // 支持回车键提交
+        document.getElementById('authCode').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                getToken();
+            }
+        });
     </script>
 </body>
 </html>

@@ -58,6 +58,7 @@ func (s *Server) setupRoutes() {
 	http.HandleFunc("/api/service/start", s.handleStartService)
 	http.HandleFunc("/api/service/stop", s.handleStopService)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("web/static"))))
+	http.Handle("/tools/", http.StripPrefix("/tools/", http.FileServer(http.Dir("tools"))))
 }
 
 // Start 启动服务器
