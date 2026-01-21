@@ -1,0 +1,25 @@
+{
+  "watch_dir": "/Users/zhuke/Documents/sync",
+  "delay_time": 5,
+  "providers": [
+    {
+      "type": "aliyun",
+      "name": "阿里云盘",
+      "enable": true,
+      "tokens": {
+        "access_token": "你的阿里云盘access_token",
+        "drive_id": "你的drive_id"
+      },
+      "target": "/CloudFileSync"
+    },
+    {
+      "type": "baidu",
+      "name": "百度云盘",
+      "enable": true,
+      "tokens": {
+        "access_token": "你的百度云盘access_token"
+      },
+      "target": "/CloudFileSync"
+    }
+  ]
+}
