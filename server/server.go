@@ -49,7 +49,11 @@ func NewServer(cfg *config.Config, configPath string, port int) *Server {
 
 // setupRoutes 设置路由
 func (s *Server) setupRoutes() {
-	http.HandleFunc("/", s.handleIndex)
+	// 静态文件路由（必须放在 "/" 之前）
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("web/static"))))
+	http.Handle("/tools/", http.StripPrefix("/tools/", http.FileServer(http.Dir("tools"))))
+
+	// API 路由
 	http.HandleFunc("/api/config", s.handleConfig)
 	http.HandleFunc("/api/config/save", s.handleSaveConfig)
 	http.HandleFunc("/api/providers", s.handleProviders)
@@ -57,8 +61,9 @@ func (s *Server) setupRoutes() {
 	http.HandleFunc("/api/service/status", s.handleServiceStatus)
 	http.HandleFunc("/api/service/start", s.handleStartService)
 	http.HandleFunc("/api/service/stop", s.handleStopService)
-	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("web/static"))))
-	http.Handle("/tools/", http.StripPrefix("/tools/", http.FileServer(http.Dir("tools"))))
+
+	// 首页路由（必须放在最后，作为默认路由）
+	http.HandleFunc("/", s.handleIndex)
 }
 
 // Start 启动服务器
@@ -74,6 +79,11 @@ func (s *Server) Stop() error {
 
 // handleIndex 处理首页
 func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
+	// 只处理根路径
+	if r.URL.Path != "/" {
+		http.NotFound(w, r)
+		return
+	}
 	http.ServeFile(w, r, "web/index.html")
 }
 
